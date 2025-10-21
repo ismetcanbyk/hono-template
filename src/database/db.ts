@@ -1,10 +1,8 @@
 import { type Db, MongoClient } from "mongodb";
 import { env } from "../env.js";
 
-
 let client: MongoClient | null = null;
 let db: Db | null = null;
-
 
 export async function connect(): Promise<Db> {
 	if (db) {
@@ -30,14 +28,12 @@ export async function connect(): Promise<Db> {
 	}
 }
 
-
 export async function getDb(): Promise<Db> {
 	if (!db) {
 		await connect();
 	}
 	return db as Db;
 }
-
 
 export async function disconnect(): Promise<void> {
 	if (client) {
@@ -47,7 +43,6 @@ export async function disconnect(): Promise<void> {
 		console.log("MongoDB bağlantısı kapatıldı");
 	}
 }
-
 
 export async function ping(): Promise<boolean> {
 	try {

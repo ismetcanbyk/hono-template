@@ -1,18 +1,17 @@
 import { serve } from "@hono/node-server";
+import { prometheus } from "@hono/prometheus";
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { etag } from "hono/etag";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { secureHeaders } from "hono/secure-headers";
-import { auth, type User, type Session } from "./auth.js";
-import { connect, getDb, ping, disconnect } from "./database/db.js";
-import { env } from "./env.js";
-import { prometheus } from "@hono/prometheus";
-import { cors } from "hono/cors";
 import { rateLimiter } from "hono-rate-limiter";
+import { auth, type Session, type User } from "./auth.js";
+import { connect, disconnect, ping } from "./database/db.js";
+import { env } from "./env.js";
 import { TestSchema } from "./schema/test.schema.js";
-import { zValidator } from "@hono/zod-validator";
-
 
 type AppEnv = {
 	Variables: {
@@ -23,51 +22,49 @@ type AppEnv = {
 
 const app = new Hono<AppEnv>();
 
-
 await connect();
 
+app.use(
+	"/api/*",
+	cors({
+		origin: "*",
+		allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+		allowHeaders: ["Content-Type", "Authorization"],
+		exposeHeaders: ["Content-Length", "Content-Type", "Authorization"],
+		credentials: true,
+	}),
+);
 
-app.use('/api/*', cors({
-	origin: '*',
-	allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-	allowHeaders: ['Content-Type', 'Authorization'],
-	exposeHeaders: ['Content-Length', 'Content-Type', 'Authorization'],
-	credentials: true,
-}))
+const { printMetrics, registerMetrics } = prometheus();
 
-const { printMetrics, registerMetrics } = prometheus()
-
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
 	const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
-	c.set('user', session?.user ?? null);
-	c.set('session', session?.session ?? null);
+	c.set("user", session?.user ?? null);
+	c.set("session", session?.session ?? null);
 
 	await next();
 });
 
-app.use('*', registerMetrics)
-app.get('/metrics', printMetrics)
-app.get('/', (c) => c.text('foo'))
-
+app.use("*", registerMetrics);
+app.get("/metrics", printMetrics);
+app.get("/", (c) => c.text("foo"));
 
 // Test Schema Validation
-app.post('/api/validate-schema', zValidator('json', TestSchema), (c) => {
+app.post("/api/validate-schema", zValidator("json", TestSchema), (c) => {
 	return c.json({
-		message: 'Schema validated',
-		data: c.req.valid('json'),
+		message: "Schema validated",
+		data: c.req.valid("json"),
 	});
 });
 
-
-app.get('/api/me', (c) => {
-	const user = c.get('user');
-	const session = c.get('session');
+app.get("/api/me", (c) => {
+	const user = c.get("user");
+	const session = c.get("session");
 
 	if (!user || !session) {
-		return c.json({ error: 'Unauthorized' }, 401);
+		return c.json({ error: "Unauthorized" }, 401);
 	}
-
 
 	return c.json({
 		user: {
@@ -82,11 +79,21 @@ app.get('/api/me', (c) => {
 	});
 });
 
-app.use(etag(), logger(), prettyJSON(), secureHeaders(), rateLimiter({
-	windowMs: 15 * 60 * 1000,
-	limit: 100,
-	keyGenerator: (c) => c.req.header('Authorization') || c.req.header('X-Forwarded-For') || c.req.header('User-Agent') || 'anonymous',
-}));
+app.use(
+	etag(),
+	logger(),
+	prettyJSON(),
+	secureHeaders(),
+	rateLimiter({
+		windowMs: 15 * 60 * 1000,
+		limit: 100,
+		keyGenerator: (c) =>
+			c.req.header("Authorization") ||
+			c.req.header("X-Forwarded-For") ||
+			c.req.header("User-Agent") ||
+			"anonymous",
+	}),
+);
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
