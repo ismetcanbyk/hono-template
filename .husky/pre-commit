@@ -1,0 +1,5 @@
+. "$(dirname -- "$0")/_/husky.sh"
+
+bunx @biomejs/biome check --write --unsafe .
+
+bun run build
