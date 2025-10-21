@@ -1,75 +1,63 @@
 import { type Db, MongoClient } from "mongodb";
 import { env } from "../env.js";
 
-class Database {
-	private client: MongoClient | null = null;
-	private db: Db | null = null;
-	private static instance: Database;
 
-	private constructor() {}
+let client: MongoClient | null = null;
+let db: Db | null = null;
 
-	public static getInstance(): Database {
-		if (!Database.instance) {
-			Database.instance = new Database();
-		}
-		return Database.instance;
+
+export async function connect(): Promise<Db> {
+	if (db) {
+		return db;
 	}
 
-	public async connect(): Promise<Db> {
-		if (this.db) {
-			return this.db;
-		}
+	try {
+		client = new MongoClient(env.DATABASE_URL, {
+			maxPoolSize: 10,
+			minPoolSize: 5,
+			connectTimeoutMS: 10000,
+			socketTimeoutMS: 45000,
+		});
 
-		try {
-			this.client = new MongoClient(env.DATABASE_URL, {
-				maxPoolSize: 10,
-				minPoolSize: 5,
-				connectTimeoutMS: 10000,
-				socketTimeoutMS: 45000,
-			});
+		await client.connect();
+		db = client.db();
 
-			await this.client.connect();
-			this.db = this.client.db();
-
-			console.log("✅ MongoDB bağlantısı başarılı");
-			return this.db;
-		} catch (error) {
-			console.error("❌ MongoDB bağlantı hatası:", error);
-			throw error;
-		}
-	}
-
-	public getDb(): Db {
-		if (!this.db) {
-			throw new Error(
-				"Veritabanı bağlantısı henüz kurulmadı. Önce connect() metodunu çağırın.",
-			);
-		}
-		return this.db;
-	}
-
-	public async disconnect(): Promise<void> {
-		if (this.client) {
-			await this.client.close();
-			this.client = null;
-			this.db = null;
-			console.log("MongoDB bağlantısı kapatıldı");
-		}
-	}
-
-	public async ping(): Promise<boolean> {
-		try {
-			if (!this.db) {
-				return false;
-			}
-			await this.db.admin().ping();
-			return true;
-		} catch (error) {
-			console.error("MongoDB ping hatası:", error);
-			return false;
-		}
+		console.log("✅ MongoDB bağlantısı başarılı");
+		return db;
+	} catch (error) {
+		console.error("❌ MongoDB bağlantı hatası:", error);
+		throw error;
 	}
 }
 
-export const database = Database.getInstance();
-export const getDb = () => database.getDb();
+
+export async function getDb(): Promise<Db> {
+	if (!db) {
+		await connect();
+	}
+	return db as Db;
+}
+
+
+export async function disconnect(): Promise<void> {
+	if (client) {
+		await client.close();
+		client = null;
+		db = null;
+		console.log("MongoDB bağlantısı kapatıldı");
+	}
+}
+
+
+export async function ping(): Promise<boolean> {
+	try {
+		if (!db) {
+			return false;
+		}
+		await db.admin().ping();
+		return true;
+	} catch (error) {
+		console.error("MongoDB ping hatası:", error);
+		return false;
+	}
+}

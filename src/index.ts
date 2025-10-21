@@ -1,28 +1,97 @@
-import "@total-typescript/ts-reset";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { etag } from "hono/etag";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { secureHeaders } from "hono/secure-headers";
-import { createAuth } from "./auth.js";
-import { database } from "./database/db.js";
+import { auth, type User, type Session } from "./auth.js";
+import { connect, getDb, ping, disconnect } from "./database/db.js";
 import { env } from "./env.js";
+import { prometheus } from "@hono/prometheus";
+import { cors } from "hono/cors";
+import { rateLimiter } from "hono-rate-limiter";
+import { TestSchema } from "./schema/test.schema.js";
+import { zValidator } from "@hono/zod-validator";
 
-const app = new Hono();
 
-await database.connect();
+type AppEnv = {
+	Variables: {
+		user: User | null;
+		session: Session | null;
+	};
+};
 
-const auth = createAuth();
+const app = new Hono<AppEnv>();
 
-app.use(etag(), logger(), prettyJSON(), secureHeaders());
 
-app.get("/", (c) => c.text("Hello Hono!"));
+await connect();
+
+
+app.use('/api/*', cors({
+	origin: '*',
+	allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+	allowHeaders: ['Content-Type', 'Authorization'],
+	exposeHeaders: ['Content-Length', 'Content-Type', 'Authorization'],
+	credentials: true,
+}))
+
+const { printMetrics, registerMetrics } = prometheus()
+
+app.use('*', async (c, next) => {
+	const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+	c.set('user', session?.user ?? null);
+	c.set('session', session?.session ?? null);
+
+	await next();
+});
+
+app.use('*', registerMetrics)
+app.get('/metrics', printMetrics)
+app.get('/', (c) => c.text('foo'))
+
+
+// Test Schema Validation
+app.post('/api/validate-schema', zValidator('json', TestSchema), (c) => {
+	return c.json({
+		message: 'Schema validated',
+		data: c.req.valid('json'),
+	});
+});
+
+
+app.get('/api/me', (c) => {
+	const user = c.get('user');
+	const session = c.get('session');
+
+	if (!user || !session) {
+		return c.json({ error: 'Unauthorized' }, 401);
+	}
+
+
+	return c.json({
+		user: {
+			id: user.id,
+			email: user.email,
+			name: user.name,
+		},
+		session: {
+			id: session.id,
+			expiresAt: session.expiresAt,
+		},
+	});
+});
+
+app.use(etag(), logger(), prettyJSON(), secureHeaders(), rateLimiter({
+	windowMs: 15 * 60 * 1000,
+	limit: 100,
+	keyGenerator: (c) => c.req.header('Authorization') || c.req.header('X-Forwarded-For') || c.req.header('User-Agent') || 'anonymous',
+}));
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 app.get("/health", async (c) => {
-	const isDbHealthy = await database.ping();
+	const isDbHealthy = await ping();
 
 	if (!isDbHealthy) {
 		return c.json(
@@ -42,13 +111,13 @@ app.get("/health", async (c) => {
 
 process.on("SIGINT", async () => {
 	console.log("\n🛑 Sunucu kapatılıyor...");
-	await database.disconnect();
+	await disconnect();
 	process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
 	console.log("\n🛑 Sunucu kapatılıyor...");
-	await database.disconnect();
+	await disconnect();
 	process.exit(0);
 });
 
