@@ -5,22 +5,22 @@ import type { AppEnv } from "../types/app.ts";
 const health = new Hono<AppEnv>();
 
 health.get("/health", async (c) => {
-  const isDbHealthy = await ping();
+	const isDbHealthy = await ping();
 
-  if (!isDbHealthy) {
-    return c.json(
-      {
-        status: "unhealthy",
-        database: "disconnected",
-      },
-      503
-    );
-  }
+	if (!isDbHealthy) {
+		return c.json(
+			{
+				status: "unhealthy",
+				database: "disconnected",
+			},
+			503,
+		);
+	}
 
-  return c.json({
-    status: "healthy",
-    database: "connected",
-  });
+	return c.json({
+		status: "healthy",
+		database: "connected",
+	});
 });
 
 export default health;

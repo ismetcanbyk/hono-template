@@ -7,10 +7,10 @@ const api = new Hono<AppEnv>();
 
 // Schema validation for test endpoint
 api.post("/validate-schema", zValidator("json", TestSchema), (c) => {
-  return c.json({
-    message: "Schema validated",
-    data: c.req.valid("json"),
-  });
+	return c.json({
+		message: "Schema validated",
+		data: c.req.valid("json"),
+	});
 });
 
 export default api;

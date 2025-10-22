@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { connect } from "./database/db.js";
 import {
-  setupAuth,
-  setupCORS,
-  setupErrorHandler,
-  setupGlobalMiddleware,
+	setupAuth,
+	setupCORS,
+	setupErrorHandler,
+	setupGlobalMiddleware,
 } from "./middleware/index.js";
 import routes from "./routes/index.js";
 import { startServer } from "./server.js";

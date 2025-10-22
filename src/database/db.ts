@@ -19,8 +19,6 @@ export async function connect(): Promise<Db> {
 
 		await client.connect();
 		db = client.db();
-
-		console.log("✅ MongoDB bağlantısı başarılı");
 		return db;
 	} catch (error) {
 		console.error("❌ MongoDB bağlantı hatası:", error);
@@ -40,7 +38,6 @@ export async function disconnect(): Promise<void> {
 		await client.close();
 		client = null;
 		db = null;
-		console.log("MongoDB bağlantısı kapatıldı");
 	}
 }
 
