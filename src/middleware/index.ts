@@ -8,6 +8,7 @@ import { rateLimiter } from "hono-rate-limiter";
 import { auth } from "../auth.js";
 import type { Hono } from "hono";
 import type { AppEnv } from "../types/app.js";
+import { errorHandler } from "./global-error-handler.js";
 
 export const { printMetrics, registerMetrics } = prometheus();
 
@@ -18,7 +19,7 @@ export function setupGlobalMiddleware(app: Hono<AppEnv>) {
   app.use("*", logger());
   app.use("*", prettyJSON());
   app.use("*", secureHeaders());
-
+  app.onError((err, c) => errorHandler(err, c));
   app.use(
     "*",
     rateLimiter({
