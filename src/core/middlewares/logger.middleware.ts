@@ -1,14 +1,17 @@
 import { pinoLogger as logger } from "hono-pino";
 import pino from "pino";
 import pretty from "pino-pretty";
+import { env } from "@/config";
 
-import { env } from "@/config/environment-variables";
-
-export function pinoLogger() {
+/**
+ * Pino logger middleware for request/response logging
+ * Uses pretty printing in development, JSON in production
+ */
+export function loggerMiddleware() {
 	return logger({
 		pino: pino(
 			{
-				level: env.LOG_LEVEL ?? "info",
+				level: env.LOG_LEVEL,
 			},
 			env.NODE_ENV === "production" ? undefined : pretty(),
 		),

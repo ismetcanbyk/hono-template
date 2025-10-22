@@ -1,21 +1,36 @@
-import { Hono } from "hono";
-import { connect } from "@/config/database/db";
-import { setupAuth, setupCORS, setupErrorHandler, setupGlobalMiddleware } from "@/middleware";
-import routes from "@/routes";
-import { startServer } from "@/server";
-import type { AppEnv } from "@/types/app";
+import { createApp } from "./app";
+import { createAuthConfig, database } from "./config";
+import { createServer } from "./server";
 
-const app = new Hono<AppEnv>();
+/**
+ * Application entry point
+ * Initializes dependencies and starts the server
+ */
+async function bootstrap() {
+	try {
+		console.info("🔧 Starting application...");
 
-await connect();
+		// 1. Connect to database
+		console.info("📦 Connecting to database...");
+		await database.connect();
 
-setupGlobalMiddleware(app);
-setupCORS(app);
-setupAuth(app);
+		// 2. Initialize authentication
+		console.info("🔐 Initializing authentication...");
+		const auth = await createAuthConfig();
 
-app.route("/", routes);
+		// 3. Create application
+		console.info("🏗️  Creating application...");
+		const app = createApp(auth);
 
-// Error handler should be registered after routes
-setupErrorHandler(app);
+		// 4. Start server
+		console.info("🚀 Starting server...");
+		const server = createServer();
+		server.start(app);
+	} catch (error) {
+		console.error("❌ Failed to start application:", error);
+		process.exit(1);
+	}
+}
 
-startServer(app);
+// Start the application
+bootstrap();

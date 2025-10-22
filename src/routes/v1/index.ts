@@ -1,0 +1,19 @@
+import { Hono } from "hono";
+import type { AppEnv } from "@/core/types/app.types";
+import apiRoutes from "./api.route";
+import exampleRoutes from "./example.route";
+
+/**
+ * V1 API routes aggregator
+ * Combines all v1 routes under /api/v1 prefix
+ * Note: Auth routes are mounted at top level (/api/auth) to serve all API versions
+ */
+export function createV1Routes() {
+	const v1Routes = new Hono<AppEnv>();
+
+	// Mount route groups
+	v1Routes.route("/", apiRoutes);
+	v1Routes.route("/examples", exampleRoutes);
+
+	return v1Routes;
+}

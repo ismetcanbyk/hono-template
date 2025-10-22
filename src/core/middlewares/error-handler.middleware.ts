@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
+import { env } from "@/config";
 
 interface ErrorResponse {
 	success: false;
@@ -12,10 +13,14 @@ interface ErrorResponse {
 	timestamp: string;
 }
 
-export function globalErrorHandler(error: Error, c: Context): Response {
+/**
+ * Global error handler middleware
+ * Handles different error types: HTTPException, ZodError, MongoDB errors, and generic errors
+ */
+export function errorHandlerMiddleware(error: Error, c: Context): Response {
 	const timestamp = new Date().toISOString();
 
-	// Log the error (will be picked up by pino-logger if configured)
+	// Log the error
 	console.error("Error occurred:", {
 		error: error.message,
 		stack: error.stack,
@@ -123,7 +128,7 @@ export function globalErrorHandler(error: Error, c: Context): Response {
 			error: {
 				code: "DATABASE_ERROR",
 				message: "A database error occurred",
-				details: process.env.NODE_ENV === "development" ? mongoError.message : undefined,
+				details: env.NODE_ENV === "development" ? mongoError.message : undefined,
 			},
 			timestamp,
 		};
@@ -138,7 +143,7 @@ export function globalErrorHandler(error: Error, c: Context): Response {
 			code: "INTERNAL_SERVER_ERROR",
 			message: error.message || "An unexpected error occurred",
 			details:
-				process.env.NODE_ENV === "development"
+				env.NODE_ENV === "development"
 					? {
 							stack: error.stack,
 							name: error.name,
