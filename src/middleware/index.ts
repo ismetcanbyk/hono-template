@@ -1,7 +1,6 @@
 import { prometheus } from "@hono/prometheus";
 import { cors } from "hono/cors";
 import { etag } from "hono/etag";
-import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { secureHeaders } from "hono/secure-headers";
 import { rateLimiter } from "hono-rate-limiter";
@@ -9,6 +8,7 @@ import { auth } from "../auth.js";
 import type { Hono } from "hono";
 import type { AppEnv } from "../types/app.js";
 import { errorHandler } from "./global-error-handler.js";
+import { pinoLogger } from "./pino-logger.js";
 
 export const { printMetrics, registerMetrics } = prometheus();
 
@@ -16,7 +16,7 @@ export function setupGlobalMiddleware(app: Hono<AppEnv>) {
   app.use("*", registerMetrics);
 
   app.use("*", etag());
-  app.use("*", logger());
+  app.use("*", pinoLogger());
   app.use("*", prettyJSON());
   app.use("*", secureHeaders());
   app.onError((err, c) => errorHandler(err, c));

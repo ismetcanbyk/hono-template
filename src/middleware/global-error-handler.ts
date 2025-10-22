@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
 import { MongoError } from "mongodb";
+import { isAppError } from "../utils/app-error.js";
 
 // Error response type
 interface ErrorResponse {
@@ -16,11 +17,25 @@ interface ErrorResponse {
 
 // Global Error Handler
 export const errorHandler = (err: Error, c: Context) => {
-  console.error("Error occurred:", err);
-
   const timestamp = new Date().toISOString();
 
-  // 1. Zod errors
+  // 1. Custom AppError
+  if (isAppError(err)) {
+    return c.json<ErrorResponse>(
+      {
+        success: false,
+        error: {
+          message: err.message,
+          code: err.code,
+          details: err.details,
+        },
+        timestamp,
+      },
+      err.status as any
+    );
+  }
+
+  // 2. Zod errors
   if (err instanceof ZodError) {
     const formattedErrors = err.issues.map((error) => ({
       path: error.path.join("."),
@@ -42,7 +57,7 @@ export const errorHandler = (err: Error, c: Context) => {
     );
   }
 
-  // 2. Hono HTTP Exception
+  // 3. Hono HTTP Exception
   if (err instanceof HTTPException) {
     return c.json<ErrorResponse>(
       {
@@ -57,7 +72,7 @@ export const errorHandler = (err: Error, c: Context) => {
     );
   }
 
-  // 3. MongoDB errors
+  // 4. MongoDB errors
   if (err instanceof MongoError || (err as any).name === "MongoError") {
     const mongoError = err as MongoError;
 
@@ -128,7 +143,7 @@ export const errorHandler = (err: Error, c: Context) => {
     );
   }
 
-  // 4. Generic errors
+  // 5. Generic errors
   return c.json<ErrorResponse>(
     {
       success: false,
