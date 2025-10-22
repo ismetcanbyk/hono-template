@@ -1,17 +1,43 @@
 import { Hono } from "hono";
-import { printMetrics } from "../middleware/index.js";
-import apiRoutes from "./api.js";
-import authRoutes from "./auth.js";
-import healthRoutes from "./health.js";
-import type { AppEnv } from "../types/app.js";
+import type { Auth } from "@/config";
+import { printMetrics } from "@/core/middlewares";
+import type { AppEnv } from "@/core/types/app.types";
+import healthRoutes from "@/routes/health.route";
+import { createV1Routes } from "@/routes/v1";
+import { createAuthRoutes } from "@/routes/v1/auth.route";
 
-const routes = new Hono<AppEnv>();
+/**
+ * Main routes factory
+ * Aggregates all application routes
+ */
+export function createRoutes(auth: Auth) {
+	const routes = new Hono<AppEnv>();
 
-routes.get("/", (c) => c.text("foo"));
-routes.get("/metrics", printMetrics);
+	// Root endpoint
+	routes.get("/", (c) =>
+		c.json({
+			message: "Welcome to Hono API",
+			version: "1.0.0",
+			endpoints: {
+				health: "/health",
+				metrics: "/metrics",
+				auth: "/api/auth",
+				api: "/api/v1",
+			},
+		}),
+	);
 
-routes.route("/", healthRoutes);
-routes.route("/api", apiRoutes);
-routes.route("/api", authRoutes);
+	// Metrics endpoint (Prometheus)
+	routes.get("/metrics", printMetrics);
 
-export default routes;
+	// Health check routes
+	routes.route("/", healthRoutes);
+
+	// Auth routes (no versioning - serves all API versions)
+	routes.route("/api", createAuthRoutes(auth));
+
+	// API v1 routes
+	routes.route("/api/v1", createV1Routes());
+
+	return routes;
+}
