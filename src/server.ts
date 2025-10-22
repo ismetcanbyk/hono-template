@@ -11,8 +11,8 @@ export function startServer(app: Hono<AppEnv>) {
     process.exit(0);
   };
 
-  process.on("SIGINT", gracefulShutdown);
-  process.on("SIGTERM", gracefulShutdown);
+  process.on("SIGINT", async () => gracefulShutdown());
+  process.on("SIGTERM", async () => gracefulShutdown());
 
   serve(
     {
@@ -21,6 +21,6 @@ export function startServer(app: Hono<AppEnv>) {
     },
     (info) => {
       console.log(`🚀 Server is running on http://localhost:${info.port}`);
-    }
+    },
   );
 }

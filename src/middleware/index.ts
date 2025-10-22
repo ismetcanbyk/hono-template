@@ -7,7 +7,6 @@ import { rateLimiter } from "hono-rate-limiter";
 import { auth } from "../auth.js";
 import type { Hono } from "hono";
 import type { AppEnv } from "../types/app.js";
-import { errorHandler } from "./global-error-handler.js";
 import { pinoLogger } from "./pino-logger.js";
 
 export const { printMetrics, registerMetrics } = prometheus();
@@ -19,7 +18,6 @@ export function setupGlobalMiddleware(app: Hono<AppEnv>) {
   app.use("*", pinoLogger());
   app.use("*", prettyJSON());
   app.use("*", secureHeaders());
-  app.onError((err, c) => errorHandler(err, c));
   app.use(
     "*",
     rateLimiter({
@@ -30,7 +28,7 @@ export function setupGlobalMiddleware(app: Hono<AppEnv>) {
         c.req.header("X-Forwarded-For") ||
         c.req.header("User-Agent") ||
         "anonymous",
-    })
+    }),
   );
 }
 
@@ -43,7 +41,7 @@ export function setupCORS(app: Hono<AppEnv>) {
       allowHeaders: ["Content-Type", "Authorization"],
       exposeHeaders: ["Content-Length", "Content-Type", "Authorization"],
       credentials: true,
-    })
+    }),
   );
 }
 
