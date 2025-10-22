@@ -1,5 +1,5 @@
 import { createApp } from "./app";
-import { createAuthConfig, database } from "./config";
+import { createAuthConfig, database, logger } from "./config";
 import { createServer } from "./server";
 
 /**
@@ -8,26 +8,26 @@ import { createServer } from "./server";
  */
 async function bootstrap() {
 	try {
-		console.info("🔧 Starting application...");
+		logger.info("🔧 Starting application...");
 
 		// 1. Connect to database
-		console.info("📦 Connecting to database...");
+		logger.info("📦 Connecting to database...");
 		await database.connect();
 
 		// 2. Initialize authentication
-		console.info("🔐 Initializing authentication...");
+		logger.info("🔐 Initializing authentication...");
 		const auth = await createAuthConfig();
 
 		// 3. Create application
-		console.info("🏗️  Creating application...");
+		logger.info("🏗️  Creating application...");
 		const app = createApp(auth);
 
 		// 4. Start server
-		console.info("🚀 Starting server...");
+		logger.info("🚀 Starting server...");
 		const server = createServer();
 		server.start(app);
 	} catch (error) {
-		console.error("❌ Failed to start application:", error);
+		logger.error({ err: error }, "❌ Failed to start application");
 		process.exit(1);
 	}
 }

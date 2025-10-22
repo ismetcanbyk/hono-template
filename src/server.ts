@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import type { Hono } from "hono";
-import { database, env } from "./config";
+import { database, env, logger } from "./config";
 import type { AppEnv } from "./core/types/app.types";
 
 type ServerInstance = ReturnType<typeof serve>;
@@ -22,10 +22,10 @@ export class Server {
 			port: env.PORT,
 		});
 
-		console.info(`🚀 Server started on http://localhost:${env.PORT}`);
-		console.info(`📊 Metrics available at http://localhost:${env.PORT}/metrics`);
-		console.info(`🏥 Health check at http://localhost:${env.PORT}/health`);
-		console.info(`📚 API v1 at http://localhost:${env.PORT}/api/v1`);
+		logger.info(`🚀 Server started on http://localhost:${env.PORT}`);
+		logger.info(`📊 Metrics available at http://localhost:${env.PORT}/metrics`);
+		logger.info(`🏥 Health check at http://localhost:${env.PORT}/health`);
+		logger.info(`📚 API v1 at http://localhost:${env.PORT}/api/v1`);
 
 		this.setupGracefulShutdown();
 	}
@@ -36,22 +36,22 @@ export class Server {
 	 */
 	private setupGracefulShutdown(): void {
 		const shutdown = async (signal: string) => {
-			console.info(`\n⚠️  ${signal} received, starting graceful shutdown...`);
+			logger.info(`\n⚠️  ${signal} received, starting graceful shutdown...`);
 
 			try {
 				// Close server
 				if (this.server) {
 					this.server.close();
-					console.info("✅ Server closed");
+					logger.info("✅ Server closed");
 				}
 
 				// Disconnect database
 				await database.disconnect();
 
-				console.info("✅ Graceful shutdown completed");
+				logger.info("✅ Graceful shutdown completed");
 				process.exit(0);
 			} catch (error) {
-				console.error("❌ Error during shutdown:", error);
+				logger.error({ err: error }, "❌ Error during shutdown");
 				process.exit(1);
 			}
 		};
@@ -59,31 +59,31 @@ export class Server {
 		// Handle shutdown signals
 		process.on("SIGINT", () => {
 			shutdown("SIGINT").catch((error) => {
-				console.error("Error during SIGINT shutdown:", error);
+				logger.error({ err: error }, "Error during SIGINT shutdown");
 				process.exit(1);
 			});
 		});
 
 		process.on("SIGTERM", () => {
 			shutdown("SIGTERM").catch((error) => {
-				console.error("Error during SIGTERM shutdown:", error);
+				logger.error({ err: error }, "Error during SIGTERM shutdown");
 				process.exit(1);
 			});
 		});
 
 		// Handle uncaught errors
 		process.on("uncaughtException", (error) => {
-			console.error("❌ Uncaught Exception:", error);
+			logger.error({ err: error }, "❌ Uncaught Exception");
 			shutdown("uncaughtException").catch((err) => {
-				console.error("Error during uncaughtException shutdown:", err);
+				logger.error({ err }, "Error during uncaughtException shutdown");
 				process.exit(1);
 			});
 		});
 
 		process.on("unhandledRejection", (reason, promise) => {
-			console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+			logger.error({ reason, promise }, "❌ Unhandled Rejection");
 			shutdown("unhandledRejection").catch((error) => {
-				console.error("Error during unhandledRejection shutdown:", error);
+				logger.error({ err: error }, "Error during unhandledRejection shutdown");
 				process.exit(1);
 			});
 		});

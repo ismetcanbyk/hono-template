@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
-import { env } from "@/config";
+import { env, logger } from "@/config";
 
 interface ErrorResponse {
 	success: false;
@@ -21,12 +21,14 @@ export function errorHandlerMiddleware(error: Error, c: Context): Response {
 	const timestamp = new Date().toISOString();
 
 	// Log the error
-	console.error("Error occurred:", {
-		error: error.message,
-		stack: error.stack,
-		path: c.req.path,
-		method: c.req.method,
-	});
+	logger.error(
+		{
+			err: error,
+			path: c.req.path,
+			method: c.req.method,
+		},
+		"Error occurred",
+	);
 
 	// Handle Hono HTTPException
 	if (error instanceof HTTPException) {

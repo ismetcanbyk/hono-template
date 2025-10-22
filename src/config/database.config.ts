@@ -1,5 +1,6 @@
 import { type Db, MongoClient } from "mongodb";
 import { env } from "./environment.config";
+import { logger } from "./logger.config";
 
 /**
  * Database connection manager
@@ -29,10 +30,10 @@ class DatabaseManager {
 			await this.client.connect();
 			this.db = this.client.db();
 
-			console.info("✅ Database connected successfully");
+			logger.info("✅ Database connected successfully");
 			return this.db;
 		} catch (error) {
-			console.error("❌ Database connection failed:", error);
+			logger.error({ err: error }, "❌ Database connection failed");
 			throw error;
 		}
 	}
@@ -56,7 +57,7 @@ class DatabaseManager {
 			await this.client.close();
 			this.client = null;
 			this.db = null;
-			console.info("✅ Database disconnected successfully");
+			logger.info("✅ Database disconnected successfully");
 		}
 	}
 
@@ -72,7 +73,7 @@ class DatabaseManager {
 			await this.db.admin().ping();
 			return true;
 		} catch (error) {
-			console.error("❌ Database ping failed:", error);
+			logger.error({ err: error }, "❌ Database ping failed");
 			return false;
 		}
 	}
