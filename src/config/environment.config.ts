@@ -14,7 +14,7 @@ export const env = createEnv({
 		LOG_LEVEL: z.enum(["trace", "debug", "info", "warn", "error", "fatal"]).default("info"),
 
 		// Database Configuration
-		DATABASE_URL: z.string().url(),
+		DATABASE_URL: z.url(),
 
 		// Authentication Configuration
 		BETTER_AUTH_SECRET: z.string(),

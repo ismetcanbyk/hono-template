@@ -15,7 +15,7 @@ const exampleRoutes = new Hono<AppEnv>();
  */
 exampleRoutes.post("/validate", async (c) => {
 	const schema = z.object({
-		email: z.string().email(),
+		email: z.email(),
 		age: z.number().min(18),
 		username: z.string().min(3).max(20),
 	});

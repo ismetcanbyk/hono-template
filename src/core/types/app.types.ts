@@ -6,7 +6,7 @@ import type { Session, User } from "@/config";
  */
 export type AppEnv = {
 	Variables: {
-		user: User | null;
-		session: Session | null;
+		user: User;
+		session: Session;
 	};
 };
