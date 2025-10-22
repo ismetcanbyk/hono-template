@@ -1,6 +1,6 @@
 import { type Db, MongoClient } from "mongodb";
-import { env } from "./environment.config";
-import { logger } from "./logger.config";
+import { env } from "@/config/environment.config";
+import { logger } from "@/config/logger.config";
 
 /**
  * Database connection manager

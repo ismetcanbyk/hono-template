@@ -1,7 +1,7 @@
 import { serve } from "@hono/node-server";
 import type { Hono } from "hono";
-import { database, env, logger } from "./config";
-import type { AppEnv } from "./core/types/app.types";
+import { database, env, logger } from "@/config";
+import type { AppEnv } from "@/core/types/app.types";
 
 type ServerInstance = ReturnType<typeof serve>;
 

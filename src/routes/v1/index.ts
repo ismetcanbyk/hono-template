@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { AppEnv } from "@/core/types/app.types";
-import apiRoutes from "./api.route";
-import exampleRoutes from "./example.route";
+import apiRoutes from "@/routes/v1/api.route";
+import exampleRoutes from "@/routes/v1/example.route";
 
 /**
  * V1 API routes aggregator

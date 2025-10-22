@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import type { Auth } from "@/config";
 import { printMetrics } from "@/core/middlewares";
 import type { AppEnv } from "@/core/types/app.types";
-import healthRoutes from "./health.route";
-import { createV1Routes } from "./v1";
-import { createAuthRoutes } from "./v1/auth.route";
+import healthRoutes from "@/routes/health.route";
+import { createV1Routes } from "@/routes/v1";
+import { createAuthRoutes } from "@/routes/v1/auth.route";
 
 /**
  * Main routes factory

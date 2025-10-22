@@ -1,6 +1,6 @@
 import pino from "pino";
 import pretty from "pino-pretty";
-import { env } from "./environment.config";
+import { env } from "@/config/environment.config";
 
 /**
  * Application-wide Pino logger configuration

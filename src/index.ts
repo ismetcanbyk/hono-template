@@ -1,6 +1,6 @@
-import { createApp } from "./app";
-import { createAuthConfig, database, logger } from "./config";
-import { createServer } from "./server";
+import { createApp } from "@/app";
+import { createAuthConfig, database, logger } from "@/config";
+import { createServer } from "@/server";
 
 /**
  * Application entry point
