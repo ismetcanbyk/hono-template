@@ -3,6 +3,7 @@ import { connect } from "./database/db.js";
 import {
   setupAuth,
   setupCORS,
+  setupErrorHandler,
   setupGlobalMiddleware,
 } from "./middleware/index.js";
 import routes from "./routes/index.js";
@@ -18,5 +19,8 @@ setupCORS(app);
 setupAuth(app);
 
 app.route("/", routes);
+
+// Error handler should be registered after routes
+setupErrorHandler(app);
 
 startServer(app);

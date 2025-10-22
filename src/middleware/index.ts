@@ -8,6 +8,7 @@ import { auth } from "../auth.js";
 import type { Hono } from "hono";
 import type { AppEnv } from "../types/app.js";
 import { pinoLogger } from "./pino-logger.js";
+import { globalErrorHandler } from "./error-handler.js";
 
 export const { printMetrics, registerMetrics } = prometheus();
 
@@ -53,3 +54,9 @@ export function setupAuth(app: Hono<AppEnv>) {
     await next();
   });
 }
+
+export function setupErrorHandler(app: Hono<AppEnv>) {
+  app.onError(globalErrorHandler);
+}
+
+export { globalErrorHandler };
