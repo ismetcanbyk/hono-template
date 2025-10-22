@@ -7,6 +7,7 @@ import {
 	errorHandlerMiddleware,
 	etagMiddleware,
 	loggerMiddleware,
+	notFoundHandler,
 	rateLimitMiddleware,
 	registerMetrics,
 	secureHeadersMiddleware,
@@ -49,6 +50,9 @@ export function createApp(auth: Auth) {
 
 	// Register routes
 	app.route("/", createRoutes(auth));
+
+	// 404 Not Found handler (must be after routes, before error handler)
+	app.notFound(notFoundHandler);
 
 	// Error handler (must be last)
 	app.onError(errorHandlerMiddleware);
