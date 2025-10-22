@@ -1,8 +1,8 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { openAPI } from "better-auth/plugins";
-import { getDb } from "./database/db.js";
-import { env } from "./env.js";
+import { getDb } from "@/config/database/db";
+import { env } from "@/config/environment-variables";
 
 export const auth = betterAuth({
 	database: mongodbAdapter(await getDb()),

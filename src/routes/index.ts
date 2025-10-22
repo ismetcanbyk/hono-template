@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import { printMetrics } from "../middleware/index.js";
-import type { AppEnv } from "../types/app.js";
-import apiRoutes from "./api.js";
-import authRoutes from "./auth.js";
-import exampleRoutes from "./example.js";
-import healthRoutes from "./health.js";
+import { printMetrics } from "@/middleware";
+import apiRoutes from "@/routes/api";
+import authRoutes from "@/routes/auth";
+import exampleRoutes from "@/routes/example";
+import healthRoutes from "@/routes/health";
+import type { AppEnv } from "@/types/app";
 
 const routes = new Hono<AppEnv>();
 

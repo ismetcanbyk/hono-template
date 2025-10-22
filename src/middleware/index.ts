@@ -5,10 +5,10 @@ import { etag } from "hono/etag";
 import { prettyJSON } from "hono/pretty-json";
 import { secureHeaders } from "hono/secure-headers";
 import { rateLimiter } from "hono-rate-limiter";
-import { auth } from "../auth.js";
-import type { AppEnv } from "../types/app.js";
-import { globalErrorHandler } from "./error-handler.js";
-import { pinoLogger } from "./pino-logger.js";
+import { auth } from "@/auth";
+import { globalErrorHandler } from "@/middleware/error-handler";
+import { pinoLogger } from "@/middleware/logger";
+import type { AppEnv } from "@/types/app";
 
 export const { printMetrics, registerMetrics } = prometheus();
 

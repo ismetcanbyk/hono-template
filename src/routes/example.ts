@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import type { AppEnv } from "../types/app.js";
+import type { AppEnv } from "@/types/app";
 
 const example = new Hono<AppEnv>();
 

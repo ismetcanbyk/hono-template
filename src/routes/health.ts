@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { ping } from "../database/db.js";
-import type { AppEnv } from "../types/app.ts";
+import { ping } from "@/config/database/db";
+import type { AppEnv } from "@/types/app";
 
 const health = new Hono<AppEnv>();
 

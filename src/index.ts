@@ -1,14 +1,9 @@
 import { Hono } from "hono";
-import { connect } from "./database/db.js";
-import {
-	setupAuth,
-	setupCORS,
-	setupErrorHandler,
-	setupGlobalMiddleware,
-} from "./middleware/index.js";
-import routes from "./routes/index.js";
-import { startServer } from "./server.js";
-import type { AppEnv } from "./types/app.js";
+import { connect } from "@/config/database/db";
+import { setupAuth, setupCORS, setupErrorHandler, setupGlobalMiddleware } from "@/middleware";
+import routes from "@/routes";
+import { startServer } from "@/server";
+import type { AppEnv } from "@/types/app";
 
 const app = new Hono<AppEnv>();
 

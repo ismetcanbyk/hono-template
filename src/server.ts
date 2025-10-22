@@ -1,8 +1,8 @@
 import { serve } from "@hono/node-server";
 import type { Hono } from "hono";
-import { disconnect } from "./database/db.js";
-import { env } from "./env.js";
-import type { AppEnv } from "./types/app.js";
+import { disconnect } from "@/config/database/db";
+import { env } from "@/config/environment-variables";
+import type { AppEnv } from "@/types/app";
 
 export function startServer(app: Hono<AppEnv>) {
 	const gracefulShutdown = async () => {

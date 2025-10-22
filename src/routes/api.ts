@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { TestSchema } from "../schema/test.schema.js";
-import type { AppEnv } from "../types/app.js";
+import { TestSchema } from "@/schema/test.schema";
+import type { AppEnv } from "@/types/app";
 
 const api = new Hono<AppEnv>();
 
