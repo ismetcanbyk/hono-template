@@ -29,11 +29,17 @@ export async function createAuthConfig() {
 				enabled: !!(env.FACEBOOK_CLIENT_ID && env.FACEBOOK_CLIENT_SECRET),
 			},
 		},
+		user: {
+			additionalFields: {
+				role: {
+					type: "string",
+					fieldName: "role", // the field name in the database
+					required: false,
+					defaultValue: "user", // the default role is `user`
+					input: false, // don't allow user to set role
+				},
+			},
+		},
 		plugins: [openAPI()],
 	});
 }
-
-// Type exports for Better Auth
-export type Auth = Awaited<ReturnType<typeof createAuthConfig>>;
-export type User = Auth["$Infer"]["Session"]["user"];
-export type Session = Auth["$Infer"]["Session"]["session"];
