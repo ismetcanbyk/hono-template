@@ -43,3 +43,8 @@ export async function createAuthConfig() {
 		plugins: [openAPI()],
 	});
 }
+
+// Type exports for Better Auth
+export type Auth = Awaited<ReturnType<typeof createAuthConfig>>;
+export type User = Auth["$Infer"]["Session"]["user"];
+export type Session = Auth["$Infer"]["Session"]["session"];
