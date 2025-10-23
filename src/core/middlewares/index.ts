@@ -9,4 +9,5 @@ export { loggerMiddleware } from "@/core/middlewares/logger.middleware";
 export { printMetrics, registerMetrics } from "@/core/middlewares/metrics.middleware";
 export { notFoundHandler } from "@/core/middlewares/not-found.middleware";
 export { rateLimitMiddleware } from "@/core/middlewares/rate-limit.middleware";
+export { requireAuth } from "@/core/middlewares/require-auth.middleware";
 export { etagMiddleware, secureHeadersMiddleware } from "@/core/middlewares/security.middleware";
