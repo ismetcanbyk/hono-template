@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { prettyJSON } from "hono/pretty-json";
+
 import type { Auth } from "@/config";
 import {
 	authMiddleware,

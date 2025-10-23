@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+
 import { database } from "@/config/database.config";
 import { logger } from "@/config/logger.config";
 import type {
@@ -47,7 +48,7 @@ export async function createTodo(input: CreateTodoInput) {
 	const session = db.client.startSession();
 
 	try {
-		const result = await session.withTransaction(async () => {
+		return await session.withTransaction(async () => {
 			const collection = await getTodosCollection();
 			const now = new Date();
 			const todoId = new ObjectId();
@@ -68,12 +69,6 @@ export async function createTodo(input: CreateTodoInput) {
 
 			return todoDocument;
 		});
-
-		if (!result) {
-			throw new Error("Transaction failed to create todo");
-		}
-
-		return result;
 	} catch (error) {
 		logger.error({ err: error }, "Failed to create todo");
 		throw error;
@@ -122,7 +117,7 @@ export async function updateTodo(todoId: ObjectId, userId: string, input: Update
 	const session = db.client.startSession();
 
 	try {
-		const result = await session.withTransaction(async () => {
+		return await session.withTransaction(async () => {
 			const collection = await getTodosCollection();
 
 			const updateDoc: Partial<TodoDocument> = {
@@ -146,8 +141,6 @@ export async function updateTodo(todoId: ObjectId, userId: string, input: Update
 
 			return todo;
 		});
-
-		return result;
 	} catch (error) {
 		logger.error({ err: error, todoId, userId }, "Failed to update todo");
 		throw error;
@@ -164,7 +157,7 @@ export async function deleteTodo(todoId: ObjectId, userId: string) {
 	const session = db.client.startSession();
 
 	try {
-		const result = await session.withTransaction(async () => {
+		return await session.withTransaction(async () => {
 			const collection = await getTodosCollection();
 
 			const deleteResult = await collection.deleteOne({ _id: todoId, userId }, { session });
@@ -179,8 +172,6 @@ export async function deleteTodo(todoId: ObjectId, userId: string) {
 
 			return deleted;
 		});
-
-		return result;
 	} catch (error) {
 		logger.error({ err: error, todoId, userId }, "Failed to delete todo");
 		throw error;
@@ -197,7 +188,7 @@ export async function toggleTodoCompletion(todoId: ObjectId, userId: string) {
 	const session = db.client.startSession();
 
 	try {
-		const result = await session.withTransaction(async () => {
+		return await session.withTransaction(async () => {
 			const collection = await getTodosCollection();
 
 			const currentTodo = await collection.findOne({ _id: todoId, userId }, { session });
@@ -226,8 +217,6 @@ export async function toggleTodoCompletion(todoId: ObjectId, userId: string) {
 
 			return todo;
 		});
-
-		return result;
 	} catch (error) {
 		logger.error({ err: error, todoId, userId }, "Failed to toggle todo");
 		throw error;
@@ -244,7 +233,7 @@ export async function deleteCompletedTodos(userId: string) {
 	const session = db.client.startSession();
 
 	try {
-		const result = await session.withTransaction(async () => {
+		return await session.withTransaction(async () => {
 			const collection = await getTodosCollection();
 
 			const deleteResult = await collection.deleteMany({ userId, completed: true }, { session });
@@ -255,8 +244,6 @@ export async function deleteCompletedTodos(userId: string) {
 
 			return deletedCount;
 		});
-
-		return result;
 	} catch (error) {
 		logger.error({ err: error, userId }, "Failed to delete completed todos");
 		throw error;

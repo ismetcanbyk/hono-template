@@ -15,7 +15,7 @@ A modern, production-ready backend template built with TypeScript, Hono, and Bet
 
 ## 📋 Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - MongoDB 4.4+
 - npm or yarn
 
@@ -61,6 +61,7 @@ The server will start at `http://localhost:3000`
 ## 📚 Available Endpoints
 
 ### Core Endpoints
+
 - `GET /` - API information
 - `GET /health` - Health check with database status
 - `GET /health/liveness` - Kubernetes liveness probe
@@ -68,6 +69,7 @@ The server will start at `http://localhost:3000`
 - `GET /metrics` - Prometheus metrics
 
 ### API v1
+
 - `POST /api/v1/validate-schema` - Test endpoint with validation
 - `POST /api/v1/auth/*` - Authentication endpoints (Better Auth)
 - `GET /api/v1/examples/*` - Example error handling endpoints
@@ -122,20 +124,25 @@ npm run format       # Format code
 ## 📊 Monitoring
 
 ### Metrics
+
 Prometheus metrics are available at `/metrics`:
+
 - HTTP request duration
 - Request count by method/status
 - Active connections
 - Custom business metrics
 
 ### Logging
+
 Structured JSON logging with Pino:
+
 - Request/response logging
 - Error logging with stack traces
 - Database operation logging
 - Configurable log levels
 
 ### Health Checks
+
 - `/health` - Overall application health
 - `/health/liveness` - Is the app running?
 - `/health/readiness` - Is the app ready to serve traffic?
@@ -143,6 +150,7 @@ Structured JSON logging with Pino:
 ## 🔐 Authentication
 
 This template uses [Better Auth](https://better-auth.com/) with:
+
 - Email/password authentication
 - Google OAuth (optional)
 - Facebook OAuth (optional)
@@ -150,6 +158,7 @@ This template uses [Better Auth](https://better-auth.com/) with:
 - OpenAPI documentation
 
 ### Auth Endpoints
+
 - `POST /api/v1/auth/sign-up` - Register new user
 - `POST /api/v1/auth/sign-in` - Login
 - `POST /api/v1/auth/sign-out` - Logout
@@ -161,17 +170,18 @@ All errors follow a consistent format:
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Human-readable error message",
-    "details": {}
-  },
-  "timestamp": "2025-01-01T00:00:00.000Z"
+	"success": false,
+	"error": {
+		"code": "ERROR_CODE",
+		"message": "Human-readable error message",
+		"details": {}
+	},
+	"timestamp": "2025-01-01T00:00:00.000Z"
 }
 ```
 
 Error types handled:
+
 - **Validation Errors** - Zod schema validation failures
 - **HTTP Exceptions** - 4xx/5xx errors with proper status codes
 - **Database Errors** - MongoDB-specific errors
@@ -182,6 +192,7 @@ Error types handled:
 ### Environment Variables
 
 Ensure all required environment variables are set:
+
 - `NODE_ENV` - Set to `production`
 - `DATABASE_URL` - MongoDB connection string
 - `BETTER_AUTH_SECRET` - Secure random string (32+ characters)
@@ -203,6 +214,7 @@ CMD ["npm", "start"]
 ### Kubernetes
 
 Health check configuration:
+
 ```yaml
 livenessProbe:
   httpGet:
@@ -222,6 +234,7 @@ readinessProbe:
 ## 📖 API Documentation
 
 API documentation is auto-generated via Better Auth's OpenAPI plugin. Access it at:
+
 - Development: `http://localhost:3000/api/v1/auth/openapi`
 
 ## 🤝 Contributing
@@ -239,6 +252,7 @@ MIT License - feel free to use this template for your projects!
 ## 🙏 Acknowledgments
 
 Built with:
+
 - [Hono](https://hono.dev/) - Fast web framework
 - [Better Auth](https://better-auth.com/) - Authentication
 - [Zod](https://zod.dev/) - Schema validation

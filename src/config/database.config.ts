@@ -1,4 +1,5 @@
 import { type Db, MongoClient } from "mongodb";
+
 import { env } from "@/config/environment.config";
 import { logger } from "@/config/logger.config";
 

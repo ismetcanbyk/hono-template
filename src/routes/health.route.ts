@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+
 import { database } from "@/config";
 import type { AppEnv } from "@/core/types/app.types";
 

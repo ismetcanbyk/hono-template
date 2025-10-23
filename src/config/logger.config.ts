@@ -1,5 +1,6 @@
 import pino from "pino";
 import pretty from "pino-pretty";
+
 import { env } from "@/config/environment.config";
 
 /**

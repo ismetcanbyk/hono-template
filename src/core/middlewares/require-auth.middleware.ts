@@ -1,4 +1,5 @@
 import type { Context, Next } from "hono";
+
 import type { AppEnv } from "@/core/types/app.types";
 
 /**

@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { openAPI } from "better-auth/plugins";
+
 import { database } from "@/config/database.config";
 import { env } from "@/config/environment.config";
 

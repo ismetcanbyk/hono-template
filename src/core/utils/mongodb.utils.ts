@@ -1,6 +1,6 @@
 import type { Collection, Db, Document } from "mongodb";
 
-const collections = {
+export const collections = {
 	TODOS: "todos",
 	USERS: "users",
 } as const;

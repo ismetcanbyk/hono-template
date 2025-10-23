@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import type { AppEnv } from "@/core/types/app.types";
 
+import type { AppEnv } from "@/core/types/app.types";
 import todoRoutes from "@/routes/v1/todo.route";
 
 /**

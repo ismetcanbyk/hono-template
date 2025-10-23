@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
+
 import { env, logger } from "@/config";
 
 interface ErrorResponse {

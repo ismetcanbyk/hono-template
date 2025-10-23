@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+
 import type { Auth } from "@/config";
 import { printMetrics } from "@/core/middlewares";
 import type { AppEnv } from "@/core/types/app.types";

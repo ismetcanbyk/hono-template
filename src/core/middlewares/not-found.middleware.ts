@@ -1,5 +1,6 @@
 import type { Context } from "hono";
 import type { NotFoundHandler } from "hono/types";
+
 import { logger } from "@/config";
 import type { AppEnv } from "@/core/types/app.types";
 
