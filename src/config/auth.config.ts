@@ -33,7 +33,7 @@ export async function createAuthConfig() {
 		user: {
 			additionalFields: {
 				role: {
-					type: "string",
+					type: ["user", "admin"],
 					fieldName: "role", // the field name in the database
 					required: false,
 					defaultValue: "user", // the default role is `user`
